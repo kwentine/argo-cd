@@ -504,8 +504,8 @@ A note on noProxy: Argo CD uses exec to interact with different tools such as he
 
 ## Clusters
 
-Cluster credentials are stored in secrets same as repositories or repository credentials. Each secret must have label
-`argocd.argoproj.io/secret-type: cluster`.
+Cluster credentials are stored in secrets, in the same way as repository credentials. A secret holding cluster credentials must have the label
+`argocd.argoproj.io/secret-type: cluster` to be recognized as such by Argo CD.
 
 The secret data must include following fields:
 
@@ -555,7 +555,7 @@ tlsClientConfig:
     # certificates against. If ServerName is empty, the hostname used to contact the
     # server is used.
     serverName: string
-# Disable automatic compression for requests to the cluster 
+# Disable automatic compression for requests to the cluster
 disableCompression: boolean
 ```
 
@@ -565,7 +565,7 @@ disableCompression: boolean
     To resolve this issue, you can increase the `ARGOCD_K8S_CLIENT_MAX_IDLE_CONNECTIONS` environment variable in the
     Application controller.
 
-!!! important 
+!!! important
     Note that if you specify a command to run under `execProviderConfig`, that command must be available in the Argo CD image. See [BYOI (Build Your Own Image)](custom_tools.md#byoi-build-your-own-image).
 
 Cluster secret example:
@@ -615,7 +615,7 @@ stringData:
       "tlsClientConfig": {
         "insecure": false,
         "caData": "<base64 encoded certificate>"
-      }        
+      }
     }
 ```
 
@@ -630,7 +630,7 @@ to perform actions within the cluster
 
 #### Argo CD Management Role
 
-The role created for Argo CD (the "management role") will need to have a trust policy suitable for assumption by certain 
+The role created for Argo CD (the "management role") will need to have a trust policy suitable for assumption by certain
 Argo CD Service Accounts *and by itself*.
 
 The service accounts that need to assume this role are:
@@ -718,7 +718,7 @@ metadata:
 The Argo CD management role (`arn:aws:iam::<AWS_ACCOUNT_ID>:role/<ARGO_CD_MANAGEMENT_IAM_ROLE_NAME>` in our example) additionally
 needs to be allowed to assume a role for each cluster added to Argo CD.
 
-If we create a role named `<IAM_CLUSTER_ROLE>` for an EKS cluster we are adding to Argo CD, we would update the permission 
+If we create a role named `<IAM_CLUSTER_ROLE>` for an EKS cluster we are adding to Argo CD, we would update the permission
 policy of the Argo CD management role to include the following:
 
 ```json
@@ -747,7 +747,7 @@ assumes this role, and calls the AWS API to get an auth token via argocd-k8s-aut
 the added cluster's API endpoint.
 
 If we create role `arn:aws:iam::<AWS_ACCOUNT_ID>:role/<IAM_CLUSTER_ROLE>` for a cluster being added to Argo CD, we should
-set its trust policy to give the Argo CD management role permission to assume it. Note that we're granting the Argo CD 
+set its trust policy to give the Argo CD management role permission to assume it. Note that we're granting the Argo CD
 management role permission to assume this role above, but we also need to permit that action via the cluster role's
 trust policy.
 
@@ -792,7 +792,7 @@ aws eks associate-access-policy \
 ```
 
 The above role is granted cluster admin permissions via `AmazonEKSClusterAdminPolicy`. The Argo CD management role that
-assume this role is therefore granted the same cluster admin permissions when it generates an API token when adding the 
+assume this role is therefore granted the same cluster admin permissions when it generates an API token when adding the
 associated EKS cluster.
 
 **AWS Auth (Deprecated)**
@@ -823,10 +823,10 @@ Example kube-system/aws-auth configmap for your cluster managed by Argo CD:
 ```yaml
 apiVersion: v1
 data:
-  # Other groups and accounts omitted for brevity. Ensure that no other rolearns and/or groups are inadvertently removed, 
+  # Other groups and accounts omitted for brevity. Ensure that no other rolearns and/or groups are inadvertently removed,
   # or you risk borking access to your cluster.
   #
-  # The group name is a RoleBinding which you use to map to a [Cluster]Role. See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-binding-examples  
+  # The group name is a RoleBinding which you use to map to a [Cluster]Role. See https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-binding-examples
   mapRoles: |
     - "groups":
       - "<GROUP-NAME-IN-K8S-RBAC>"
@@ -842,7 +842,7 @@ provider's platform. In this case, there are two options:
 1. Use `execProviderConfig` to call the AWS authentication mechanism which enables the injection of environment variables to supply credentials
 2. Leverage the new AWS profile option available in Argo CD release 2.10
 
-Both of these options will require the steps involving IAM and the `aws-auth` config map (defined above) to provide the 
+Both of these options will require the steps involving IAM and the `aws-auth` config map (defined above) to provide the
 principal with access to the cluster.
 
 ##### Using execProviderConfig with Environment Variables
@@ -915,10 +915,10 @@ stringData:
       "tlsClientConfig": {
         "insecure": false,
         "caData": "<base64 encoded certificate>"
-      }        
+      }
     }
 ```
-This will instruct Argo CD to read the file at the provided path and use the credentials defined within to authenticate to AWS. 
+This will instruct Argo CD to read the file at the provided path and use the credentials defined within to authenticate to AWS.
 The profile must be mounted in both the `argocd-server` and `argocd-application-controller` components in order for this to work.
 For example, the following values can be defined in a Helm-based Argo CD deployment:
 
@@ -1260,7 +1260,7 @@ An optional comma-separated list of `metadata.annotations` keys can be configure
 ## Auto respect RBAC for controller
 
 Argo CD controller can be restricted from discovering/syncing specific resources using just controller RBAC, without having to manually configure resource exclusions.
-This feature can be enabled by setting `resource.respectRBAC` key in argocd cm, once it is set the controller will automatically stop watching for resources 
+This feature can be enabled by setting `resource.respectRBAC` key in argocd cm, once it is set the controller will automatically stop watching for resources
 that it does not have the permission to list/access. Possible values for `resource.respectRBAC` are:
     - `strict` : This setting checks whether the list call made by controller is forbidden/unauthorized and if it is, it will cross-check the permission by making a `SelfSubjectAccessReview` call for the resource.
     - `normal` : This will only check whether the list call response is forbidden/unauthorized and skip `SelfSubjectAccessReview` call, to minimize any extra api-server calls.
@@ -1270,7 +1270,7 @@ Users who are comfortable with an increase in kube api-server calls can opt for 
 
 Notes:
 
-* When set to use `strict` mode controller must have RBAC permission to `create` a `SelfSubjectAccessReview` resource 
+* When set to use `strict` mode controller must have RBAC permission to `create` a `SelfSubjectAccessReview` resource
 * The `SelfSubjectAccessReview` request will be only made for the `list` verb, it is assumed that if `list` is allowed for a resource then all other permissions are also available to the controller.
 
 Example argocd cm with `resource.respectRBAC` set to `strict`:
